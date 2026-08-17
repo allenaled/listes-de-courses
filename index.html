@@ -9,7 +9,6 @@
 <style>
   :root{
     --paper: #ece6d7;
-    --paper-dark: #ddd4bc;
     --ink: #2b2b26;
     --forest: #2c4a3e;
     --forest-light: #3f6656;
@@ -26,7 +25,7 @@
     min-height:100vh;
     font-family:'Inter', sans-serif;
     color:var(--ink);
-    padding: 28px 16px 80px;
+    padding: 28px 16px 90px;
   }
   .sheet{
     max-width:520px;
@@ -47,7 +46,7 @@
   header{
     padding: 4px 8px 18px 20px;
     border-bottom: 2px solid var(--ink);
-    margin-bottom: 22px;
+    margin-bottom: 18px;
   }
   h1{
     font-family:'Kalam', cursive;
@@ -63,90 +62,92 @@
     color: rgba(43,43,38,0.6);
     font-family:'Space Mono', monospace;
     display:flex;
-    justify-content:space-between;
+    justify-content:flex-end;
     align-items:center;
     gap:8px;
   }
-  .sync-dot{
-    width:7px;height:7px;border-radius:50%;
-    background: var(--forest-light);
-    display:inline-block;
-    margin-right:5px;
-    animation: pulse 2.4s infinite;
+
+  /* ---- Onglets de listes ---- */
+  .tabs-wrap{ padding: 0 20px 6px; }
+  .tabs{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
+  .tab{
+    font-family:'Kalam', cursive; font-size:1.02rem; font-weight:700;
+    padding:7px 16px; border-radius:20px; border:2px solid var(--ink);
+    background:transparent; color:var(--ink); cursor:pointer;
+    display:flex; align-items:center; gap:6px;
+    transform: rotate(-0.3deg);
+    transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
   }
-  @keyframes pulse{
-    0%,100%{opacity:1;}
-    50%{opacity:0.35;}
+  .tab:nth-child(even){ transform: rotate(0.4deg); }
+  .tab.active{ background: var(--forest); color: var(--paper); border-color: var(--forest); }
+  .tab .badge{
+    font-family:'Space Mono', monospace; font-size:0.68rem;
+    background: rgba(0,0,0,0.12); padding:1px 6px; border-radius:10px;
+  }
+  .tab.active .badge{ background: rgba(255,255,255,0.22); }
+  .tab-new{
+    font-family:'Space Mono', monospace; font-size:0.85rem;
+    padding:7px 14px; border-radius:20px; border:2px dashed rgba(43,43,38,0.4);
+    background:transparent; color: rgba(43,43,38,0.6); cursor:pointer;
+  }
+  .tab-new:hover{ border-color: var(--forest); color: var(--forest); }
+
+  .new-list-row{ display:none; gap:8px; padding: 10px 20px 4px; }
+  .new-list-row.show{ display:flex; }
+  .new-list-row input{
+    flex:1; font-family:'Inter', sans-serif; font-size:0.95rem;
+    padding:8px 10px; border:none; border-bottom: 2px solid var(--ink);
+    background: transparent; outline:none;
+  }
+  .new-list-row button{
+    font-family:'Kalam', cursive; font-weight:700;
+    background: var(--forest); color: var(--paper); border:none;
+    padding:8px 16px; border-radius:3px; cursor:pointer;
   }
 
+  .no-list{
+    margin: 24px 20px; text-align:center;
+    font-family:'Kalam', cursive; color: rgba(43,43,38,0.5); font-size:1.1rem;
+  }
+
+  /* ---- Contenu de la liste active ---- */
+  .list-panel{ display:none; }
+  .list-panel.show{ display:block; }
+
   .add-row{
-    padding: 0 20px 20px;
-    display:flex;
-    flex-direction:column;
-    gap:10px;
+    padding: 14px 20px 16px; display:flex; flex-direction:column; gap:10px;
+    border-top: 1px dashed var(--line); margin-top: 8px;
   }
-  .add-fields{
-    display:flex;
-    gap:8px;
-  }
-  .field-wrap{
-    position:relative;
-    flex:1;
-  }
+  .add-fields{ display:flex; gap:8px; }
   input[type="text"], input[type="number"]{
-    width:100%;
-    font-family:'Inter', sans-serif;
-    font-size:1rem;
-    padding:10px 12px;
-    border:none;
-    border-bottom: 2px solid var(--ink);
-    background: transparent;
-    color: var(--ink);
-    outline:none;
+    width:100%; font-family:'Inter', sans-serif; font-size:1rem;
+    padding:10px 12px; border:none; border-bottom: 2px solid var(--ink);
+    background: transparent; color: var(--ink); outline:none;
   }
   input[type="text"]::placeholder{ color: rgba(43,43,38,0.4); }
-  input[type="text"]:focus, input[type="number"]:focus{
-    border-bottom-color: var(--forest);
-  }
-  #productInput{ font-size:1.05rem; }
+  input:focus{ border-bottom-color: var(--forest); }
   .qty-field{ width:78px; flex:none; }
   .qty-field input{ text-align:center; font-family:'Space Mono', monospace; }
   select#unitSelect{
-    flex:none;
-    width:118px;
-    font-family:'Space Mono', monospace;
-    font-size:0.85rem;
-    padding:10px 8px;
-    border:none;
-    border-bottom:2px solid var(--ink);
-    background:transparent;
-    color:var(--ink);
-    outline:none;
-    appearance:none;
-    -webkit-appearance:none;
+    flex:none; width:118px;
+    font-family:'Space Mono', monospace; font-size:0.85rem;
+    padding:10px 8px; border:none; border-bottom:2px solid var(--ink);
+    background:transparent; color:var(--ink); outline:none;
+    appearance:none; -webkit-appearance:none;
     background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%);
     background-position: calc(100% - 14px) 18px, calc(100% - 9px) 18px;
     background-size: 5px 5px, 5px 5px;
     background-repeat:no-repeat;
   }
   .suggest-hint{
-    font-family:'Space Mono', monospace;
-    font-size:0.72rem;
-    color: var(--mustard);
-    min-height: 14px;
-    padding-left:2px;
+    font-family:'Space Mono', monospace; font-size:0.72rem;
+    color: var(--mustard); min-height: 14px; padding-left:2px;
   }
   .add-btn{
     align-self:flex-end;
-    font-family:'Kalam', cursive;
-    font-weight:700;
-    font-size:1.1rem;
-    background: var(--forest);
-    color: var(--paper);
-    border:none;
-    padding:10px 22px;
-    border-radius:3px;
-    cursor:pointer;
+    font-family:'Kalam', cursive; font-weight:700; font-size:1.1rem;
+    background: var(--forest); color: var(--paper); border:none;
+    padding:10px 22px; border-radius:3px; cursor:pointer;
     transform: rotate(-0.4deg);
     transition: transform 0.15s ease, background 0.15s ease;
   }
@@ -154,114 +155,121 @@
   .add-btn:active{ transform: scale(0.97); }
 
   .list-section{ padding: 0 20px; }
-  .section-label{
-    font-family:'Space Mono', monospace;
-    font-size:0.72rem;
-    text-transform:uppercase;
-    letter-spacing:1.5px;
-    color: rgba(43,43,38,0.5);
-    margin: 22px 0 8px;
-    display:flex;
-    align-items:center;
-    gap:8px;
-  }
-  .section-label::after{
-    content:"";
-    flex:1;
-    height:1px;
-    background: var(--line);
-  }
-
   ul.items{ list-style:none; margin:0; padding:0; }
   .item{
-    display:flex;
-    align-items:center;
-    gap:12px;
-    padding:11px 2px;
-    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; gap:12px;
+    padding:11px 2px; border-bottom:1px solid var(--line);
     position:relative;
   }
   .check{
-    width:24px;height:24px;
-    flex:none;
-    border:2px solid var(--forest);
-    border-radius:50%;
-    cursor:pointer;
-    display:flex;align-items:center;justify-content:center;
-    background:transparent;
-    transition: background 0.15s ease;
+    width:24px;height:24px; flex:none;
+    border:2px solid var(--forest); border-radius:50%;
+    cursor:pointer; display:flex;align-items:center;justify-content:center;
+    background:transparent; transition: background 0.15s ease;
   }
   .check::after{
-    content:"";
-    width:11px;height:6px;
-    border-left:2.5px solid var(--paper);
-    border-bottom:2.5px solid var(--paper);
-    transform: rotate(-45deg) translateY(-1px);
-    opacity:0;
+    content:""; width:11px;height:6px;
+    border-left:2.5px solid var(--paper); border-bottom:2.5px solid var(--paper);
+    transform: rotate(-45deg) translateY(-1px); opacity:0;
   }
   .item.done .check{ background: var(--forest); }
   .item.done .check::after{ opacity:1; }
 
   .item-body{ flex:1; min-width:0; }
-  .item-name{
-    font-size:1.02rem;
-    font-weight:500;
-    word-break:break-word;
-    position:relative;
-    display:inline-block;
-  }
-  .item-qty{
-    font-family:'Space Mono', monospace;
-    font-size:0.78rem;
-    color: var(--mustard);
-    margin-left:8px;
-  }
+  .item-name{ font-size:1.02rem; font-weight:500; word-break:break-word; position:relative; display:inline-block; }
+  .item-qty{ font-family:'Space Mono', monospace; font-size:0.78rem; color: var(--mustard); margin-left:8px; }
   .item.done .item-name{ color: rgba(43,43,38,0.42); }
   .item.done .item-qty{ color: rgba(43,43,38,0.32); }
 
   .strike{
-    position:absolute;
-    left:-2%; top:52%;
-    width:0%;
-    height:2px;
-    background: var(--pencil-red);
-    transform: rotate(-2deg);
-    transition: width 0.35s cubic-bezier(.4,0,.2,1);
-    transform-origin:left;
+    position:absolute; left:-2%; top:52%; width:0%; height:2px;
+    background: var(--pencil-red); transform: rotate(-2deg);
+    transition: width 0.3s cubic-bezier(.4,0,.2,1); transform-origin:left;
   }
   .item.done .strike{ width:104%; }
 
+  .item.fading{ animation: fadeOut 0.4s ease forwards; }
+  @keyframes fadeOut{ to { opacity:0; transform: translateX(6px); max-height:0; padding-top:0; padding-bottom:0; margin:0; } }
+
   .remove-btn{
-    flex:none;
-    background:none;
-    border:none;
-    color: rgba(43,43,38,0.35);
-    font-size:1.3rem;
-    line-height:1;
-    cursor:pointer;
-    padding:4px 6px;
+    flex:none; background:none; border:none; color: rgba(43,43,38,0.35);
+    font-size:1.3rem; line-height:1; cursor:pointer; padding:4px 6px;
   }
   .remove-btn:hover{ color: var(--pencil-red); }
 
   .empty{
-    text-align:center;
-    padding: 30px 10px;
-    color: rgba(43,43,38,0.45);
-    font-family:'Kalam', cursive;
-    font-size:1.15rem;
+    text-align:center; padding: 26px 10px;
+    color: rgba(43,43,38,0.45); font-family:'Kalam', cursive; font-size:1.1rem;
   }
 
+  /* ---- Barre d'actions basse ---- */
+  .actions-bar{
+    display:flex; gap:10px;
+    padding: 18px 20px 4px;
+    border-top: 2px solid var(--ink);
+    margin-top: 18px;
+  }
+  .ghost-btn{
+    flex:1;
+    font-family:'Space Mono', monospace; font-size:0.78rem;
+    background:transparent; border:1.5px solid var(--ink);
+    color: var(--ink); padding:10px 8px; border-radius:3px;
+    cursor:pointer; text-align:center;
+  }
+  .ghost-btn:hover{ background: var(--ink); color: var(--paper); }
+  .ghost-btn.danger:hover{ background: var(--pencil-red); border-color: var(--pencil-red); }
+
+  /* ---- Panneau "cochés" & confirmation ---- */
+  .overlay{
+    display:none; position:fixed; inset:0; background: rgba(20,18,12,0.45);
+    align-items:flex-end; justify-content:center; z-index:50;
+  }
+  .overlay.show{ display:flex; }
+  .drawer{
+    width:100%; max-width:520px; background: var(--paper);
+    border-radius: 14px 14px 0 0; max-height:75vh; overflow-y:auto;
+    padding: 18px 20px 24px;
+    box-shadow: 0 -8px 30px rgba(0,0,0,0.25);
+  }
+  .drawer-handle{ width:40px;height:4px;background:rgba(43,43,38,0.25); border-radius:2px; margin: 0 auto 14px; }
+  .drawer h2{ font-family:'Kalam', cursive; color: var(--forest); margin:0 0 12px; font-size:1.4rem; }
+  .drawer .item-body .item-name{ color: rgba(43,43,38,0.55); }
+  .drawer .item{ opacity:0.9; }
+  .undo-btn{
+    flex:none; background:none; border:1.5px solid var(--forest);
+    color:var(--forest); font-family:'Space Mono', monospace; font-size:0.7rem;
+    padding:5px 9px; border-radius:3px; cursor:pointer;
+  }
+  .close-drawer{
+    display:block; margin: 16px auto 0;
+    font-family:'Kalam', cursive; font-weight:700;
+    background:var(--forest); color:var(--paper); border:none;
+    padding:9px 24px; border-radius:20px; cursor:pointer;
+  }
+
+  .confirm-box{
+    max-width:380px; width:88%; background: var(--paper);
+    border-radius: 10px; padding: 22px 20px; margin:auto;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+  .confirm-box p{ font-family:'Inter', sans-serif; font-size:0.98rem; margin: 0 0 18px; }
+  .confirm-actions{ display:flex; gap:10px; }
+  .confirm-actions button{
+    flex:1; font-family:'Space Mono', monospace; font-size:0.8rem;
+    padding:10px 8px; border-radius:3px; cursor:pointer;
+  }
+  .confirm-cancel{ background:transparent; border:1.5px solid var(--ink); color:var(--ink); }
+  .confirm-ok{ background:var(--pencil-red); border:1.5px solid var(--pencil-red); color:var(--paper); }
+
   .footer-note{
-    text-align:center;
-    margin-top:26px;
-    font-family:'Space Mono', monospace;
-    font-size:0.7rem;
+    text-align:center; margin-top:20px;
+    font-family:'Space Mono', monospace; font-size:0.68rem;
     color: rgba(43,43,38,0.4);
   }
 
   @media (prefers-reduced-motion: reduce){
-    .sync-dot{ animation:none; }
     .strike{ transition:none; }
+    .item.fading{ animation:none; display:none; }
   }
 </style>
 </head>
@@ -270,219 +278,379 @@
 <div class="sheet">
   <header>
     <h1>Carnet de courses</h1>
-    <div class="sub"><span><span class="sync-dot"></span>partagé en direct</span><span id="countLabel">0 article</span></div>
+    <div class="sub"><span id="statusLabel"></span></div>
   </header>
 
-  <div class="add-row">
-    <div class="add-fields">
-      <div class="field-wrap">
-        <input type="text" id="productInput" placeholder="Ajouter un article… (ex: courgettes)" autocomplete="off">
+  <div class="tabs-wrap">
+    <div class="tabs" id="tabs"></div>
+  </div>
+  <div class="new-list-row" id="newListRow">
+    <input type="text" id="newListInput" placeholder="Nom de la liste (ex: Noël)" autocomplete="off">
+    <button id="confirmNewList">Créer</button>
+  </div>
+
+  <div class="no-list" id="noListMsg" style="display:none;">Créez votre première liste avec le bouton "+ Nouvelle liste" ✏️</div>
+
+  <div class="list-panel" id="listPanel">
+    <div class="add-row">
+      <div class="add-fields">
+        <div class="field-wrap" style="flex:1;">
+          <input type="text" id="productInput" placeholder="Ajouter un article…" autocomplete="off">
+        </div>
+        <div class="qty-field"><input type="number" id="qtyInput" value="1" min="0" step="0.1"></div>
+        <select id="unitSelect">
+          <option value="pièce">pièce</option>
+          <option value="kg">kg</option>
+          <option value="g">g</option>
+          <option value="L">L</option>
+          <option value="ml">ml</option>
+          <option value="paquet">paquet</option>
+          <option value="pack">pack</option>
+          <option value="botte">botte</option>
+          <option value="motte">motte</option>
+          <option value="boîte">boîte</option>
+          <option value="tranche(s)">tranche(s)</option>
+          <option value="sachet">sachet</option>
+        </select>
       </div>
-      <div class="qty-field">
-        <input type="number" id="qtyInput" value="1" min="0" step="0.1">
-      </div>
-      <select id="unitSelect">
-        <option value="pièce">pièce</option>
-        <option value="kg">kg</option>
-        <option value="g">g</option>
-        <option value="L">L</option>
-        <option value="ml">ml</option>
-        <option value="paquet">paquet</option>
-        <option value="botte">botte</option>
-        <option value="motte">motte</option>
-        <option value="boîte">boîte</option>
-        <option value="tranche(s)">tranche(s)</option>
-        <option value="sachet">sachet</option>
-      </select>
+      <div class="suggest-hint" id="suggestHint">&nbsp;</div>
+      <button class="add-btn" id="addBtn">+ Ajouter</button>
     </div>
-    <div class="suggest-hint" id="suggestHint">&nbsp;</div>
-    <button class="add-btn" id="addBtn">+ Ajouter</button>
+
+    <div class="list-section">
+      <ul class="items" id="todoList"></ul>
+      <div id="todoEmpty" class="empty" style="display:none;">La liste est vide, ajoutez quelque chose ✏️</div>
+    </div>
+
+    <div class="actions-bar">
+      <button class="ghost-btn" id="showCheckedBtn">Voir les articles cochés</button>
+      <button class="ghost-btn danger" id="resetListBtn">Réinitialiser la liste</button>
+    </div>
   </div>
 
-  <div class="list-section">
-    <div class="section-label">À acheter</div>
-    <ul class="items" id="todoList"></ul>
-    <div id="todoEmpty" class="empty" style="display:none;">La liste est vide, ajoutez quelque chose ✏️</div>
-
-    <div class="section-label" id="doneLabel" style="display:none;">Achetés</div>
-    <ul class="items" id="doneList"></ul>
-  </div>
-
-  <div class="footer-note">appuyez sur le rond pour valider un achat</div>
+  <div class="footer-note">appuyez sur le rond pour valider un achat — 3 secondes pour annuler</div>
 </div>
 
-<script>
-(function(){
-  const STORAGE_KEY = 'courses:liste';
-  let items = [];
-  let pollTimer = null;
+<div class="overlay" id="overlay">
+  <div class="drawer">
+    <div class="drawer-handle"></div>
+    <h2 id="drawerTitle">Articles cochés</h2>
+    <ul class="items" id="checkedList"></ul>
+    <div id="checkedEmpty" class="empty" style="display:none;">Rien de coché pour l'instant</div>
+    <button class="close-drawer" id="closeDrawerBtn">Fermer</button>
+  </div>
+</div>
 
-  // Dictionnaire simple de suggestion d'unité par mot-clé produit
-  const UNIT_RULES = [
-    { keywords: ['pomme de terre','patate','carotte','farine','sucre','riz','pâtes','oignon jaune','lentille','semoule'], unit:'kg', qty:1 },
-    { keywords: ['beurre'], unit:'motte', qty:1 },
-    { keywords: ['lait','jus','huile','vinaigre'], unit:'L', qty:1 },
-    { keywords: ['crème','yaourt liquide'], unit:'ml', qty:250 },
-    { keywords: ['oeuf','œuf'], unit:'boîte', qty:1 },
-    { keywords: ['fromage','camembert','brie','reblochon'], unit:'pièce', qty:1 },
-    { keywords: ['jambon','saumon fumé','bacon'], unit:'tranche(s)', qty:4 },
-    { keywords: ['pain','baguette'], unit:'pièce', qty:1 },
-    { keywords: ['persil','basilic','ciboulette','radis','asperge'], unit:'botte', qty:1 },
-    { keywords: ['café','thé','biscuit','chips','pâtes à tartiner'], unit:'paquet', qty:1 },
-    { keywords: ['levure','soupe déshydratée','sauce en sachet'], unit:'sachet', qty:1 },
-    { keywords: ['courgette','tomate','citron','pomme','orange','poivron','avocat','banane','oignon','concombre','aubergine','kiwi','poire'], unit:'pièce', qty:3 },
-  ];
+<div class="overlay" id="confirmOverlay">
+  <div class="confirm-box">
+    <p id="confirmText">Confirmer ?</p>
+    <div class="confirm-actions">
+      <button class="confirm-cancel" id="confirmCancelBtn">Annuler</button>
+      <button class="confirm-ok" id="confirmOkBtn">Confirmer</button>
+    </div>
+  </div>
+</div>
 
-  function suggestUnit(name){
-    const n = name.toLowerCase().trim();
-    if(!n) return null;
-    for(const rule of UNIT_RULES){
-      for(const kw of rule.keywords){
-        if(n.includes(kw)) return rule;
-      }
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import {
+  getFirestore, doc, setDoc, onSnapshot
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBvRIzy5V2xBWWXxd-RSam_aOEgwN5O-Lc",
+  authDomain: "listes-de-courses-61dd7.firebaseapp.com",
+  projectId: "listes-de-courses-61dd7",
+  storageBucket: "listes-de-courses-61dd7.firebasestorage.app",
+  messagingSenderId: "385130983000",
+  appId: "1:385130983000:web:3d1667c233fdebc1d2642d"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+const docRef = doc(db, "courses", "liste-partagee");
+
+const GRACE_MS = 3000;
+let state = { lists: [], activeListId: null };
+let hideTimers = {};
+let suppressNextSnapshot = false; // évite de re-render juste après notre propre écriture
+
+const UNIT_RULES = [
+  { keywords: ['pomme de terre','patate','carotte','farine','sucre','riz','pâtes','oignon jaune','lentille','semoule'], unit:'kg', qty:1 },
+  { keywords: ['beurre'], unit:'motte', qty:1 },
+  { keywords: ['lait','jus','huile','vinaigre','eau'], unit:'pack', qty:1 },
+  { keywords: ['crème','yaourt liquide'], unit:'ml', qty:250 },
+  { keywords: ['oeuf','œuf'], unit:'boîte', qty:1 },
+  { keywords: ['fromage','camembert','brie','reblochon'], unit:'pièce', qty:1 },
+  { keywords: ['jambon','saumon fumé','bacon'], unit:'tranche(s)', qty:4 },
+  { keywords: ['pain','baguette'], unit:'pièce', qty:1 },
+  { keywords: ['persil','basilic','ciboulette','radis','asperge'], unit:'botte', qty:1 },
+  { keywords: ['café','thé','biscuit','chips','pâtes à tartiner'], unit:'paquet', qty:1 },
+  { keywords: ['levure','soupe déshydratée','sauce en sachet'], unit:'sachet', qty:1 },
+  { keywords: ['courgette','tomate','citron','pomme','orange','poivron','avocat','banane','oignon','concombre','aubergine','kiwi','poire'], unit:'pièce', qty:3 },
+];
+function suggestUnit(name){
+  const n = name.toLowerCase().trim();
+  if(!n) return null;
+  for(const rule of UNIT_RULES) for(const kw of rule.keywords) if(n.includes(kw)) return rule;
+  return null;
+}
+function escapeHtml(str){ const d=document.createElement('div'); d.textContent=str; return d.innerHTML; }
+function formatQty(qty, unit){ const q=(qty%1===0)?qty:qty.toFixed(1); return `${q} ${unit}`; }
+function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+const tabsEl = document.getElementById('tabs');
+const newListRow = document.getElementById('newListRow');
+const newListInput = document.getElementById('newListInput');
+const confirmNewList = document.getElementById('confirmNewList');
+const noListMsg = document.getElementById('noListMsg');
+const listPanel = document.getElementById('listPanel');
+const productInput = document.getElementById('productInput');
+const qtyInput = document.getElementById('qtyInput');
+const unitSelect = document.getElementById('unitSelect');
+const suggestHint = document.getElementById('suggestHint');
+const addBtn = document.getElementById('addBtn');
+const todoList = document.getElementById('todoList');
+const todoEmpty = document.getElementById('todoEmpty');
+const showCheckedBtn = document.getElementById('showCheckedBtn');
+const resetListBtn = document.getElementById('resetListBtn');
+const overlay = document.getElementById('overlay');
+const drawerTitle = document.getElementById('drawerTitle');
+const checkedList = document.getElementById('checkedList');
+const checkedEmpty = document.getElementById('checkedEmpty');
+const closeDrawerBtn = document.getElementById('closeDrawerBtn');
+const statusLabel = document.getElementById('statusLabel');
+const confirmOverlay = document.getElementById('confirmOverlay');
+const confirmText = document.getElementById('confirmText');
+const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+const confirmOkBtn = document.getElementById('confirmOkBtn');
+
+function activeList(){ return state.lists.find(l=>l.id===state.activeListId) || null; }
+
+function askConfirm(message){
+  return new Promise(resolve=>{
+    confirmText.textContent = message;
+    confirmOverlay.classList.add('show');
+    function cleanup(result){
+      confirmOverlay.classList.remove('show');
+      confirmOkBtn.removeEventListener('click', onOk);
+      confirmCancelBtn.removeEventListener('click', onCancel);
+      resolve(result);
     }
-    return null;
-  }
-
-  const productInput = document.getElementById('productInput');
-  const qtyInput = document.getElementById('qtyInput');
-  const unitSelect = document.getElementById('unitSelect');
-  const suggestHint = document.getElementById('suggestHint');
-  const addBtn = document.getElementById('addBtn');
-  const todoList = document.getElementById('todoList');
-  const doneList = document.getElementById('doneList');
-  const todoEmpty = document.getElementById('todoEmpty');
-  const doneLabel = document.getElementById('doneLabel');
-  const countLabel = document.getElementById('countLabel');
-
-  let userTouchedUnit = false;
-  unitSelect.addEventListener('change', ()=>{ userTouchedUnit = true; });
-
-  productInput.addEventListener('input', ()=>{
-    const rule = suggestUnit(productInput.value);
-    if(rule){
-      suggestHint.textContent = `suggestion : ${rule.qty} ${rule.unit}`;
-      if(!userTouchedUnit){
-        unitSelect.value = rule.unit;
-        qtyInput.value = rule.qty;
-      }
-    } else {
-      suggestHint.innerHTML = '&nbsp;';
-    }
+    function onOk(){ cleanup(true); }
+    function onCancel(){ cleanup(false); }
+    confirmOkBtn.addEventListener('click', onOk);
+    confirmCancelBtn.addEventListener('click', onCancel);
   });
+}
 
-  productInput.addEventListener('keydown', (e)=>{
-    if(e.key === 'Enter'){ e.preventDefault(); addItem(); }
+// ---- Firestore : lecture temps réel + écriture ----
+onSnapshot(docRef, (snap)=>{
+  if(suppressNextSnapshot){ suppressNextSnapshot = false; return; }
+  if(snap.exists()){
+    const data = snap.data();
+    state.lists = data.lists || [];
+    if(!state.activeListId || !state.lists.find(l=>l.id===state.activeListId)){
+      state.activeListId = state.lists[0] ? state.lists[0].id : null;
+    }
+  } else {
+    state.lists = [];
+    state.activeListId = null;
+  }
+  statusLabel.textContent = '';
+  renderAll();
+}, (err)=>{
+  console.error(err);
+  statusLabel.textContent = 'connexion impossible';
+});
+
+async function save(){
+  suppressNextSnapshot = true;
+  try{
+    await setDoc(docRef, { lists: state.lists });
+  }catch(e){
+    console.error('Erreur de sauvegarde', e);
+    statusLabel.textContent = 'échec de sauvegarde';
+    suppressNextSnapshot = false;
+  }
+}
+
+// ---- Listes / onglets ----
+function renderTabs(){
+  tabsEl.innerHTML = '';
+  state.lists.forEach(l=>{
+    const count = l.items.filter(i=>!i.done).length;
+    const btn = document.createElement('button');
+    btn.className = 'tab' + (l.id===state.activeListId ? ' active' : '');
+    btn.innerHTML = `${escapeHtml(l.name)} <span class="badge">${count}</span>`;
+    btn.addEventListener('click', ()=>{ state.activeListId = l.id; renderAll(); });
+    tabsEl.appendChild(btn);
   });
+  const newBtn = document.createElement('button');
+  newBtn.className = 'tab-new';
+  newBtn.textContent = '+ Nouvelle liste';
+  newBtn.addEventListener('click', ()=>{
+    newListRow.classList.toggle('show');
+    if(newListRow.classList.contains('show')) newListInput.focus();
+  });
+  tabsEl.appendChild(newBtn);
+}
 
-  function resetAddForm(){
-    productInput.value = '';
-    qtyInput.value = 1;
-    unitSelect.value = 'pièce';
-    userTouchedUnit = false;
-    suggestHint.innerHTML = '&nbsp;';
-    productInput.focus();
+function createList(){
+  const name = newListInput.value.trim();
+  if(!name) { newListInput.focus(); return; }
+  const list = { id: uid(), name, items: [] };
+  state.lists.push(list);
+  state.activeListId = list.id;
+  newListInput.value = '';
+  newListRow.classList.remove('show');
+  renderAll();
+  save();
+}
+confirmNewList.addEventListener('click', createList);
+newListInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); createList(); } });
+
+let userTouchedUnit = false;
+unitSelect.addEventListener('change', ()=>{ userTouchedUnit = true; });
+productInput.addEventListener('input', ()=>{
+  const rule = suggestUnit(productInput.value);
+  if(rule){
+    suggestHint.textContent = `suggestion : ${rule.qty} ${rule.unit}`;
+    if(!userTouchedUnit){ unitSelect.value = rule.unit; qtyInput.value = rule.qty; }
+  } else { suggestHint.innerHTML = '&nbsp;'; }
+});
+productInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); addItem(); } });
+
+function resetAddForm(){
+  productInput.value=''; qtyInput.value=1; unitSelect.value='pièce';
+  userTouchedUnit=false; suggestHint.innerHTML='&nbsp;'; productInput.focus();
+}
+
+function addItem(){
+  const list = activeList();
+  if(!list) return;
+  const name = productInput.value.trim();
+  if(!name){ productInput.focus(); return; }
+  const qty = parseFloat(qtyInput.value) || 1;
+  const unit = unitSelect.value;
+  list.items.unshift({ id: uid(), name, qty, unit, done:false, hidden:false });
+  resetAddForm();
+  renderAll();
+  save();
+}
+addBtn.addEventListener('click', addItem);
+
+function toggleItem(id){
+  const list = activeList();
+  if(!list) return;
+  const it = list.items.find(i=>i.id===id);
+  if(!it) return;
+
+  if(!it.done){
+    it.done = true;
+    it.hidden = false;
+    renderAll();
+    save();
+    if(hideTimers[id]) clearTimeout(hideTimers[id]);
+    hideTimers[id] = setTimeout(()=>{
+      const li = document.querySelector(`#todoList li[data-id="${id}"]`);
+      if(li){
+        li.classList.add('fading');
+        setTimeout(()=>{ it.hidden = true; renderAll(); save(); }, 380);
+      } else {
+        it.hidden = true; renderAll(); save();
+      }
+      delete hideTimers[id];
+    }, GRACE_MS);
+  } else {
+    if(hideTimers[id]){ clearTimeout(hideTimers[id]); delete hideTimers[id]; }
+    it.done = false;
+    it.hidden = false;
+    renderAll();
+    save();
   }
+}
 
-  async function loadItems(){
-    try{
-      const res = await window.storage.get(STORAGE_KEY, true);
-      items = res ? JSON.parse(res.value) : [];
-    }catch(e){
-      items = [];
-    }
-    render();
-  }
+function removeItem(id){
+  const list = activeList();
+  if(!list) return;
+  if(hideTimers[id]){ clearTimeout(hideTimers[id]); delete hideTimers[id]; }
+  list.items = list.items.filter(i=>i.id!==id);
+  renderAll();
+  save();
+}
 
-  async function saveItems(){
-    try{
-      await window.storage.set(STORAGE_KEY, JSON.stringify(items), true);
-    }catch(e){
-      console.error('Erreur de sauvegarde', e);
-    }
-  }
-
-  function addItem(){
-    const name = productInput.value.trim();
-    if(!name) { productInput.focus(); return; }
-    const qty = parseFloat(qtyInput.value) || 1;
-    const unit = unitSelect.value;
-    items.unshift({
-      id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
-      name, qty, unit, done:false
-    });
-    resetAddForm();
-    render();
-    saveItems();
-  }
-
-  function toggleItem(id){
-    const it = items.find(i=>i.id===id);
-    if(it){ it.done = !it.done; render(); saveItems(); }
-  }
-
-  function removeItem(id){
-    items = items.filter(i=>i.id!==id);
-    render();
-    saveItems();
-  }
-
-  function formatQty(qty, unit){
-    const q = (qty % 1 === 0) ? qty : qty.toFixed(1);
-    return `${q} ${unit}`;
-  }
-
-  function itemNode(it){
-    const li = document.createElement('li');
-    li.className = 'item' + (it.done ? ' done' : '');
-    li.innerHTML = `
-      <button class="check" aria-label="Valider l'achat"></button>
-      <div class="item-body">
-        <span class="item-name">${escapeHtml(it.name)}<span class="strike"></span></span>
-        <span class="item-qty">${escapeHtml(formatQty(it.qty, it.unit))}</span>
-      </div>
-      <button class="remove-btn" aria-label="Supprimer">×</button>
-    `;
-    li.querySelector('.check').addEventListener('click', ()=>toggleItem(it.id));
+function itemNode(it, opts){
+  opts = opts || {};
+  const li = document.createElement('li');
+  li.className = 'item' + (it.done ? ' done' : '');
+  li.dataset.id = it.id;
+  li.innerHTML = `
+    <button class="check" aria-label="Valider l'achat"></button>
+    <div class="item-body">
+      <span class="item-name">${escapeHtml(it.name)}<span class="strike"></span></span>
+      <span class="item-qty">${escapeHtml(formatQty(it.qty, it.unit))}</span>
+    </div>
+    ${opts.undo ? '<button class="undo-btn">Remettre</button>' : '<button class="remove-btn">×</button>'}
+  `;
+  li.querySelector('.check').addEventListener('click', ()=>toggleItem(it.id));
+  if(opts.undo){
+    li.querySelector('.undo-btn').addEventListener('click', ()=>toggleItem(it.id));
+  } else {
     li.querySelector('.remove-btn').addEventListener('click', ()=>removeItem(it.id));
-    return li;
   }
+  return li;
+}
 
-  function escapeHtml(str){
-    const d = document.createElement('div');
-    d.textContent = str;
-    return d.innerHTML;
+function renderList(){
+  const list = activeList();
+  if(!list){
+    listPanel.classList.remove('show');
+    noListMsg.style.display = state.lists.length ? 'none' : 'block';
+    return;
   }
+  noListMsg.style.display = 'none';
+  listPanel.classList.add('show');
 
-  function render(){
-    const todo = items.filter(i=>!i.done);
-    const done = items.filter(i=>i.done);
+  const visible = list.items.filter(i=>!i.hidden);
+  todoList.innerHTML = '';
+  visible.forEach(it=>todoList.appendChild(itemNode(it)));
+  todoEmpty.style.display = visible.length ? 'none' : 'block';
+}
 
-    todoList.innerHTML = '';
-    todo.forEach(it=>todoList.appendChild(itemNode(it)));
-    todoEmpty.style.display = todo.length ? 'none' : 'block';
+function renderCheckedDrawer(){
+  const list = activeList();
+  if(!list) return;
+  drawerTitle.textContent = `Cochés — ${list.name}`;
+  const done = list.items.filter(i=>i.done);
+  checkedList.innerHTML = '';
+  done.forEach(it=>checkedList.appendChild(itemNode(it, {undo:true})));
+  checkedEmpty.style.display = done.length ? 'none' : 'block';
+}
 
-    doneList.innerHTML = '';
-    done.forEach(it=>doneList.appendChild(itemNode(it)));
-    doneLabel.style.display = done.length ? 'flex' : 'none';
+function renderAll(){
+  renderTabs();
+  renderList();
+}
 
-    countLabel.textContent = `${todo.length} article${todo.length!==1?'s':''}`;
-  }
+showCheckedBtn.addEventListener('click', ()=>{
+  renderCheckedDrawer();
+  overlay.classList.add('show');
+});
+closeDrawerBtn.addEventListener('click', ()=> overlay.classList.remove('show'));
+overlay.addEventListener('click', (e)=>{ if(e.target===overlay) overlay.classList.remove('show'); });
 
-  addBtn.addEventListener('click', addItem);
-
-  // Rafraîchissement périodique pour voir les ajouts de l'autre appareil
-  function startPolling(){
-    if(pollTimer) clearInterval(pollTimer);
-    pollTimer = setInterval(loadItems, 4000);
-  }
-  document.addEventListener('visibilitychange', ()=>{
-    if(document.visibilityState === 'visible') loadItems();
-  });
-
-  loadItems();
-  startPolling();
-})();
+resetListBtn.addEventListener('click', async ()=>{
+  const list = activeList();
+  if(!list) return;
+  const ok = await askConfirm(`Vider entièrement la liste "${list.name}" ?`);
+  if(!ok) return;
+  Object.keys(hideTimers).forEach(id=>clearTimeout(hideTimers[id]));
+  hideTimers = {};
+  list.items = [];
+  renderAll();
+  save();
+});
 </script>
 </body>
 </html>
