@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Carnet de courses</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #ece6d7;
+    --paper-dark: #ddd4bc;
+    --ink: #2b2b26;
+    --forest: #2c4a3e;
+    --forest-light: #3f6656;
+    --pencil-red: #b23a2e;
+    --mustard: #c98a1f;
+    --line: rgba(43,43,38,0.14);
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 15% 8%, rgba(255,255,255,0.35), transparent 40%),
+      var(--paper);
+    min-height:100vh;
+    font-family:'Inter', sans-serif;
+    color:var(--ink);
+    padding: 28px 16px 80px;
+  }
+  .sheet{
+    max-width:520px;
+    margin:0 auto;
+    background: var(--paper);
+    border-radius:2px;
+    position:relative;
+  }
+  .sheet::before{
+    content:"";
+    position:absolute;
+    left:-14px; top:6px; bottom:6px;
+    width:3px;
+    background: repeating-linear-gradient(to bottom, var(--pencil-red) 0 4px, transparent 4px 12px);
+    opacity:0.55;
+    border-radius:2px;
+  }
+  header{
+    padding: 4px 8px 18px 20px;
+    border-bottom: 2px solid var(--ink);
+    margin-bottom: 22px;
+  }
+  h1{
+    font-family:'Kalam', cursive;
+    font-weight:700;
+    font-size: 2.5rem;
+    margin: 0 0 2px 0;
+    color: var(--forest);
+    letter-spacing: 0.5px;
+    transform: rotate(-0.6deg);
+  }
+  .sub{
+    font-size:0.82rem;
+    color: rgba(43,43,38,0.6);
+    font-family:'Space Mono', monospace;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:8px;
+  }
+  .sync-dot{
+    width:7px;height:7px;border-radius:50%;
+    background: var(--forest-light);
+    display:inline-block;
+    margin-right:5px;
+    animation: pulse 2.4s infinite;
+  }
+  @keyframes pulse{
+    0%,100%{opacity:1;}
+    50%{opacity:0.35;}
+  }
+
+  .add-row{
+    padding: 0 20px 20px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  .add-fields{
+    display:flex;
+    gap:8px;
+  }
+  .field-wrap{
+    position:relative;
+    flex:1;
+  }
+  input[type="text"], input[type="number"]{
+    width:100%;
+    font-family:'Inter', sans-serif;
+    font-size:1rem;
+    padding:10px 12px;
+    border:none;
+    border-bottom: 2px solid var(--ink);
+    background: transparent;
+    color: var(--ink);
+    outline:none;
+  }
+  input[type="text"]::placeholder{ color: rgba(43,43,38,0.4); }
+  input[type="text"]:focus, input[type="number"]:focus{
+    border-bottom-color: var(--forest);
+  }
+  #productInput{ font-size:1.05rem; }
+  .qty-field{ width:78px; flex:none; }
+  .qty-field input{ text-align:center; font-family:'Space Mono', monospace; }
+  select#unitSelect{
+    flex:none;
+    width:118px;
+    font-family:'Space Mono', monospace;
+    font-size:0.85rem;
+    padding:10px 8px;
+    border:none;
+    border-bottom:2px solid var(--ink);
+    background:transparent;
+    color:var(--ink);
+    outline:none;
+    appearance:none;
+    -webkit-appearance:none;
+    background-image: linear-gradient(45deg, transparent 50%, var(--ink) 50%), linear-gradient(135deg, var(--ink) 50%, transparent 50%);
+    background-position: calc(100% - 14px) 18px, calc(100% - 9px) 18px;
+    background-size: 5px 5px, 5px 5px;
+    background-repeat:no-repeat;
+  }
+  .suggest-hint{
+    font-family:'Space Mono', monospace;
+    font-size:0.72rem;
+    color: var(--mustard);
+    min-height: 14px;
+    padding-left:2px;
+  }
+  .add-btn{
+    align-self:flex-end;
+    font-family:'Kalam', cursive;
+    font-weight:700;
+    font-size:1.1rem;
+    background: var(--forest);
+    color: var(--paper);
+    border:none;
+    padding:10px 22px;
+    border-radius:3px;
+    cursor:pointer;
+    transform: rotate(-0.4deg);
+    transition: transform 0.15s ease, background 0.15s ease;
+  }
+  .add-btn:hover{ background: var(--forest-light); transform: rotate(0deg) scale(1.02); }
+  .add-btn:active{ transform: scale(0.97); }
+
+  .list-section{ padding: 0 20px; }
+  .section-label{
+    font-family:'Space Mono', monospace;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:1.5px;
+    color: rgba(43,43,38,0.5);
+    margin: 22px 0 8px;
+    display:flex;
+    align-items:center;
+    gap:8px;
+  }
+  .section-label::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background: var(--line);
+  }
+
+  ul.items{ list-style:none; margin:0; padding:0; }
+  .item{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:11px 2px;
+    border-bottom:1px solid var(--line);
+    position:relative;
+  }
+  .check{
+    width:24px;height:24px;
+    flex:none;
+    border:2px solid var(--forest);
+    border-radius:50%;
+    cursor:pointer;
+    display:flex;align-items:center;justify-content:center;
+    background:transparent;
+    transition: background 0.15s ease;
+  }
+  .check::after{
+    content:"";
+    width:11px;height:6px;
+    border-left:2.5px solid var(--paper);
+    border-bottom:2.5px solid var(--paper);
+    transform: rotate(-45deg) translateY(-1px);
+    opacity:0;
+  }
+  .item.done .check{ background: var(--forest); }
+  .item.done .check::after{ opacity:1; }
+
+  .item-body{ flex:1; min-width:0; }
+  .item-name{
+    font-size:1.02rem;
+    font-weight:500;
+    word-break:break-word;
+    position:relative;
+    display:inline-block;
+  }
+  .item-qty{
+    font-family:'Space Mono', monospace;
+    font-size:0.78rem;
+    color: var(--mustard);
+    margin-left:8px;
+  }
+  .item.done .item-name{ color: rgba(43,43,38,0.42); }
+  .item.done .item-qty{ color: rgba(43,43,38,0.32); }
+
+  .strike{
+    position:absolute;
+    left:-2%; top:52%;
+    width:0%;
+    height:2px;
+    background: var(--pencil-red);
+    transform: rotate(-2deg);
+    transition: width 0.35s cubic-bezier(.4,0,.2,1);
+    transform-origin:left;
+  }
+  .item.done .strike{ width:104%; }
+
+  .remove-btn{
+    flex:none;
+    background:none;
+    border:none;
+    color: rgba(43,43,38,0.35);
+    font-size:1.3rem;
+    line-height:1;
+    cursor:pointer;
+    padding:4px 6px;
+  }
+  .remove-btn:hover{ color: var(--pencil-red); }
+
+  .empty{
+    text-align:center;
+    padding: 30px 10px;
+    color: rgba(43,43,38,0.45);
+    font-family:'Kalam', cursive;
+    font-size:1.15rem;
+  }
+
+  .footer-note{
+    text-align:center;
+    margin-top:26px;
+    font-family:'Space Mono', monospace;
+    font-size:0.7rem;
+    color: rgba(43,43,38,0.4);
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    .sync-dot{ animation:none; }
+    .strike{ transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="sheet">
+  <header>
+    <h1>Carnet de courses</h1>
+    <div class="sub"><span><span class="sync-dot"></span>partagé en direct</span><span id="countLabel">0 article</span></div>
+  </header>
+
+  <div class="add-row">
+    <div class="add-fields">
+      <div class="field-wrap">
+        <input type="text" id="productInput" placeholder="Ajouter un article… (ex: courgettes)" autocomplete="off">
+      </div>
+      <div class="qty-field">
+        <input type="number" id="qtyInput" value="1" min="0" step="0.1">
+      </div>
+      <select id="unitSelect">
+        <option value="pièce">pièce</option>
+        <option value="kg">kg</option>
+        <option value="g">g</option>
+        <option value="L">L</option>
+        <option value="ml">ml</option>
+        <option value="paquet">paquet</option>
+        <option value="botte">botte</option>
+        <option value="motte">motte</option>
+        <option value="boîte">boîte</option>
+        <option value="tranche(s)">tranche(s)</option>
+        <option value="sachet">sachet</option>
+      </select>
+    </div>
+    <div class="suggest-hint" id="suggestHint">&nbsp;</div>
+    <button class="add-btn" id="addBtn">+ Ajouter</button>
+  </div>
+
+  <div class="list-section">
+    <div class="section-label">À acheter</div>
+    <ul class="items" id="todoList"></ul>
+    <div id="todoEmpty" class="empty" style="display:none;">La liste est vide, ajoutez quelque chose ✏️</div>
+
+    <div class="section-label" id="doneLabel" style="display:none;">Achetés</div>
+    <ul class="items" id="doneList"></ul>
+  </div>
+
+  <div class="footer-note">appuyez sur le rond pour valider un achat</div>
+</div>
+
+<script>
+(function(){
+  const STORAGE_KEY = 'courses:liste';
+  let items = [];
+  let pollTimer = null;
+
+  // Dictionnaire simple de suggestion d'unité par mot-clé produit
+  const UNIT_RULES = [
+    { keywords: ['pomme de terre','patate','carotte','farine','sucre','riz','pâtes','oignon jaune','lentille','semoule'], unit:'kg', qty:1 },
+    { keywords: ['beurre'], unit:'motte', qty:1 },
+    { keywords: ['lait','jus','huile','vinaigre'], unit:'L', qty:1 },
+    { keywords: ['crème','yaourt liquide'], unit:'ml', qty:250 },
+    { keywords: ['oeuf','œuf'], unit:'boîte', qty:1 },
+    { keywords: ['fromage','camembert','brie','reblochon'], unit:'pièce', qty:1 },
+    { keywords: ['jambon','saumon fumé','bacon'], unit:'tranche(s)', qty:4 },
+    { keywords: ['pain','baguette'], unit:'pièce', qty:1 },
+    { keywords: ['persil','basilic','ciboulette','radis','asperge'], unit:'botte', qty:1 },
+    { keywords: ['café','thé','biscuit','chips','pâtes à tartiner'], unit:'paquet', qty:1 },
+    { keywords: ['levure','soupe déshydratée','sauce en sachet'], unit:'sachet', qty:1 },
+    { keywords: ['courgette','tomate','citron','pomme','orange','poivron','avocat','banane','oignon','concombre','aubergine','kiwi','poire'], unit:'pièce', qty:3 },
+  ];
+
+  function suggestUnit(name){
+    const n = name.toLowerCase().trim();
+    if(!n) return null;
+    for(const rule of UNIT_RULES){
+      for(const kw of rule.keywords){
+        if(n.includes(kw)) return rule;
+      }
+    }
+    return null;
+  }
+
+  const productInput = document.getElementById('productInput');
+  const qtyInput = document.getElementById('qtyInput');
+  const unitSelect = document.getElementById('unitSelect');
+  const suggestHint = document.getElementById('suggestHint');
+  const addBtn = document.getElementById('addBtn');
+  const todoList = document.getElementById('todoList');
+  const doneList = document.getElementById('doneList');
+  const todoEmpty = document.getElementById('todoEmpty');
+  const doneLabel = document.getElementById('doneLabel');
+  const countLabel = document.getElementById('countLabel');
+
+  let userTouchedUnit = false;
+  unitSelect.addEventListener('change', ()=>{ userTouchedUnit = true; });
+
+  productInput.addEventListener('input', ()=>{
+    const rule = suggestUnit(productInput.value);
+    if(rule){
+      suggestHint.textContent = `suggestion : ${rule.qty} ${rule.unit}`;
+      if(!userTouchedUnit){
+        unitSelect.value = rule.unit;
+        qtyInput.value = rule.qty;
+      }
+    } else {
+      suggestHint.innerHTML = '&nbsp;';
+    }
+  });
+
+  productInput.addEventListener('keydown', (e)=>{
+    if(e.key === 'Enter'){ e.preventDefault(); addItem(); }
+  });
+
+  function resetAddForm(){
+    productInput.value = '';
+    qtyInput.value = 1;
+    unitSelect.value = 'pièce';
+    userTouchedUnit = false;
+    suggestHint.innerHTML = '&nbsp;';
+    productInput.focus();
+  }
+
+  async function loadItems(){
+    try{
+      const res = await window.storage.get(STORAGE_KEY, true);
+      items = res ? JSON.parse(res.value) : [];
+    }catch(e){
+      items = [];
+    }
+    render();
+  }
+
+  async function saveItems(){
+    try{
+      await window.storage.set(STORAGE_KEY, JSON.stringify(items), true);
+    }catch(e){
+      console.error('Erreur de sauvegarde', e);
+    }
+  }
+
+  function addItem(){
+    const name = productInput.value.trim();
+    if(!name) { productInput.focus(); return; }
+    const qty = parseFloat(qtyInput.value) || 1;
+    const unit = unitSelect.value;
+    items.unshift({
+      id: Date.now().toString(36) + Math.random().toString(36).slice(2,6),
+      name, qty, unit, done:false
+    });
+    resetAddForm();
+    render();
+    saveItems();
+  }
+
+  function toggleItem(id){
+    const it = items.find(i=>i.id===id);
+    if(it){ it.done = !it.done; render(); saveItems(); }
+  }
+
+  function removeItem(id){
+    items = items.filter(i=>i.id!==id);
+    render();
+    saveItems();
+  }
+
+  function formatQty(qty, unit){
+    const q = (qty % 1 === 0) ? qty : qty.toFixed(1);
+    return `${q} ${unit}`;
+  }
+
+  function itemNode(it){
+    const li = document.createElement('li');
+    li.className = 'item' + (it.done ? ' done' : '');
+    li.innerHTML = `
+      <button class="check" aria-label="Valider l'achat"></button>
+      <div class="item-body">
+        <span class="item-name">${escapeHtml(it.name)}<span class="strike"></span></span>
+        <span class="item-qty">${escapeHtml(formatQty(it.qty, it.unit))}</span>
+      </div>
+      <button class="remove-btn" aria-label="Supprimer">×</button>
+    `;
+    li.querySelector('.check').addEventListener('click', ()=>toggleItem(it.id));
+    li.querySelector('.remove-btn').addEventListener('click', ()=>removeItem(it.id));
+    return li;
+  }
+
+  function escapeHtml(str){
+    const d = document.createElement('div');
+    d.textContent = str;
+    return d.innerHTML;
+  }
+
+  function render(){
+    const todo = items.filter(i=>!i.done);
+    const done = items.filter(i=>i.done);
+
+    todoList.innerHTML = '';
+    todo.forEach(it=>todoList.appendChild(itemNode(it)));
+    todoEmpty.style.display = todo.length ? 'none' : 'block';
+
+    doneList.innerHTML = '';
+    done.forEach(it=>doneList.appendChild(itemNode(it)));
+    doneLabel.style.display = done.length ? 'flex' : 'none';
+
+    countLabel.textContent = `${todo.length} article${todo.length!==1?'s':''}`;
+  }
+
+  addBtn.addEventListener('click', addItem);
+
+  // Rafraîchissement périodique pour voir les ajouts de l'autre appareil
+  function startPolling(){
+    if(pollTimer) clearInterval(pollTimer);
+    pollTimer = setInterval(loadItems, 4000);
+  }
+  document.addEventListener('visibilitychange', ()=>{
+    if(document.visibilityState === 'visible') loadItems();
+  });
+
+  loadItems();
+  startPolling();
+})();
+</script>
+</body>
+</html>
