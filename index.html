@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
-<title>Carnet de courses</title>
+<title>Carnet de courses & Planning</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
@@ -28,7 +28,7 @@
     padding: 28px 16px 90px;
   }
   .sheet{
-    max-width:520px;
+    max-width:560px;
     margin:0 auto;
     background: var(--paper);
     border-radius:2px;
@@ -44,14 +44,14 @@
     border-radius:2px;
   }
   header{
-    padding: 4px 8px 18px 20px;
+    padding: 4px 8px 14px 20px;
     border-bottom: 2px solid var(--ink);
-    margin-bottom: 18px;
+    margin-bottom: 0;
   }
   h1{
     font-family:'Kalam', cursive;
     font-weight:700;
-    font-size: 2.5rem;
+    font-size: 2.3rem;
     margin: 0 0 2px 0;
     color: var(--forest);
     letter-spacing: 0.5px;
@@ -65,10 +65,29 @@
     justify-content:flex-end;
     align-items:center;
     gap:8px;
+    min-height:16px;
   }
 
-  /* ---- Onglets de listes ---- */
-  .tabs-wrap{ padding: 0 20px 6px; }
+  /* ---- Onglets de pages (niveau 1) ---- */
+  .page-tabs{
+    display:flex; gap:0; padding: 0 20px; margin: 14px 0 4px;
+    border-bottom: 1px dashed var(--line);
+  }
+  .page-tab{
+    font-family:'Kalam', cursive; font-weight:700; font-size:1.1rem;
+    padding: 8px 4px 10px; margin-right: 22px;
+    background:none; border:none; cursor:pointer;
+    color: rgba(43,43,38,0.45);
+    border-bottom: 3px solid transparent;
+    transform: translateY(1px);
+  }
+  .page-tab.active{ color: var(--forest); border-bottom-color: var(--forest); }
+
+  .page{ display:none; }
+  .page.show{ display:block; }
+
+  /* ---- Onglets de listes (niveau 2, page Courses) ---- */
+  .tabs-wrap{ padding: 16px 20px 6px; }
   .tabs{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; }
   .tab{
     font-family:'Kalam', cursive; font-size:1.02rem; font-weight:700;
@@ -110,7 +129,6 @@
     font-family:'Kalam', cursive; color: rgba(43,43,38,0.5); font-size:1.1rem;
   }
 
-  /* ---- Contenu de la liste active ---- */
   .list-panel{ display:none; }
   .list-panel.show{ display:block; }
 
@@ -119,7 +137,7 @@
     border-top: 1px dashed var(--line); margin-top: 8px;
   }
   .add-fields{ display:flex; gap:8px; }
-  input[type="text"], input[type="number"]{
+  input[type="text"], input[type="number"], input[type="date"]{
     width:100%; font-family:'Inter', sans-serif; font-size:1rem;
     padding:10px 12px; border:none; border-bottom: 2px solid var(--ink);
     background: transparent; color: var(--ink); outline:none;
@@ -202,7 +220,6 @@
     color: rgba(43,43,38,0.45); font-family:'Kalam', cursive; font-size:1.1rem;
   }
 
-  /* ---- Barre d'actions basse ---- */
   .actions-bar{
     display:flex; gap:10px;
     padding: 18px 20px 4px;
@@ -219,7 +236,6 @@
   .ghost-btn:hover{ background: var(--ink); color: var(--paper); }
   .ghost-btn.danger:hover{ background: var(--pencil-red); border-color: var(--pencil-red); }
 
-  /* ---- Panneau "cochés" & confirmation ---- */
   .overlay{
     display:none; position:fixed; inset:0; background: rgba(20,18,12,0.45);
     align-items:flex-end; justify-content:center; z-index:50;
@@ -267,6 +283,65 @@
     color: rgba(43,43,38,0.4);
   }
 
+  /* ---- Page Planning ---- */
+  .week-nav{
+    display:flex; align-items:center; gap:8px;
+    padding: 16px 20px 4px;
+  }
+  .week-arrow{
+    flex:none; width:34px; height:34px; border-radius:50%;
+    border:2px solid var(--ink); background:transparent;
+    font-family:'Kalam', cursive; font-size:1.1rem; font-weight:700;
+    cursor:pointer; display:flex; align-items:center; justify-content:center;
+  }
+  .week-arrow:hover{ background: var(--ink); color: var(--paper); }
+  .week-label{
+    flex:1; text-align:center;
+    font-family:'Kalam', cursive; font-size:1.15rem; color: var(--forest);
+  }
+  .week-tools{
+    display:flex; gap:8px; align-items:center;
+    padding: 6px 20px 14px; flex-wrap:wrap;
+  }
+  .week-tools input[type="date"]{
+    flex:1; min-width:150px; padding:8px 10px; font-size:0.9rem;
+  }
+  .today-btn{
+    flex:none; font-family:'Space Mono', monospace; font-size:0.75rem;
+    background:transparent; border:1.5px solid var(--forest); color:var(--forest);
+    padding:8px 12px; border-radius:3px; cursor:pointer;
+  }
+  .today-btn:hover{ background:var(--forest); color:var(--paper); }
+
+  .planning-table{
+    padding: 6px 20px 4px;
+    display:flex; flex-direction:column; gap:0;
+  }
+  .day-row{
+    display:flex; gap:10px; align-items:stretch;
+    padding: 10px 0; border-bottom: 1px solid var(--line);
+  }
+  .day-row.today{ background: rgba(44,74,62,0.06); border-radius:6px; padding-left:6px; padding-right:6px; margin: 0 -6px; }
+  .day-label{
+    flex:none; width:78px;
+    font-family:'Kalam', cursive; font-weight:700; font-size:1.02rem; color: var(--forest);
+    padding-top:9px; line-height:1.15;
+  }
+  .day-label .date-sub{
+    display:block; font-family:'Space Mono', monospace; font-weight:400;
+    font-size:0.68rem; color: rgba(43,43,38,0.5);
+  }
+  .meal-fields{ flex:1; display:flex; flex-direction:column; gap:6px; }
+  .meal-field{ display:flex; align-items:center; gap:8px; }
+  .meal-tag{
+    flex:none; width:38px; font-family:'Space Mono', monospace;
+    font-size:0.66rem; color: rgba(43,43,38,0.5); text-transform:uppercase;
+  }
+  .meal-field input[type="text"]{
+    padding:7px 8px; font-size:0.92rem; border-bottom:1.5px solid var(--line);
+  }
+  .meal-field input[type="text"]:focus{ border-bottom-color: var(--forest); }
+
   @media (prefers-reduced-motion: reduce){
     .strike{ transition:none; }
     .item.fading{ animation:none; display:none; }
@@ -277,58 +352,85 @@
 
 <div class="sheet">
   <header>
-    <h1>Carnet de courses</h1>
+    <h1 id="pageTitle">Carnet de courses</h1>
     <div class="sub"><span id="statusLabel"></span></div>
   </header>
 
-  <div class="tabs-wrap">
-    <div class="tabs" id="tabs"></div>
-  </div>
-  <div class="new-list-row" id="newListRow">
-    <input type="text" id="newListInput" placeholder="Nom de la liste (ex: Noël)" autocomplete="off">
-    <button id="confirmNewList">Créer</button>
+  <div class="page-tabs">
+    <button class="page-tab active" data-page="courses">🛒 Courses</button>
+    <button class="page-tab" data-page="planning">🍽️ Planning repas</button>
   </div>
 
-  <div class="no-list" id="noListMsg" style="display:none;">Créez votre première liste avec le bouton "+ Nouvelle liste" ✏️</div>
+  <!-- ==================== PAGE COURSES ==================== -->
+  <div class="page show" id="page-courses">
+    <div class="tabs-wrap">
+      <div class="tabs" id="tabs"></div>
+    </div>
+    <div class="new-list-row" id="newListRow">
+      <input type="text" id="newListInput" placeholder="Nom de la liste (ex: Noël)" autocomplete="off">
+      <button id="confirmNewList">Créer</button>
+    </div>
 
-  <div class="list-panel" id="listPanel">
-    <div class="add-row">
-      <div class="add-fields">
-        <div class="field-wrap" style="flex:1;">
-          <input type="text" id="productInput" placeholder="Ajouter un article…" autocomplete="off">
+    <div class="no-list" id="noListMsg" style="display:none;">Créez votre première liste avec le bouton "+ Nouvelle liste" ✏️</div>
+
+    <div class="list-panel" id="listPanel">
+      <div class="add-row">
+        <div class="add-fields">
+          <div class="field-wrap" style="flex:1;">
+            <input type="text" id="productInput" placeholder="Ajouter un article…" autocomplete="off">
+          </div>
+          <div class="qty-field"><input type="number" id="qtyInput" value="1" min="0" step="0.1"></div>
+          <select id="unitSelect">
+            <option value="pièce">pièce</option>
+            <option value="kg">kg</option>
+            <option value="g">g</option>
+            <option value="L">L</option>
+            <option value="ml">ml</option>
+            <option value="paquet">paquet</option>
+            <option value="pack">pack</option>
+            <option value="botte">botte</option>
+            <option value="motte">motte</option>
+            <option value="boîte">boîte</option>
+            <option value="tranche(s)">tranche(s)</option>
+            <option value="sachet">sachet</option>
+          </select>
         </div>
-        <div class="qty-field"><input type="number" id="qtyInput" value="1" min="0" step="0.1"></div>
-        <select id="unitSelect">
-          <option value="pièce">pièce</option>
-          <option value="kg">kg</option>
-          <option value="g">g</option>
-          <option value="L">L</option>
-          <option value="ml">ml</option>
-          <option value="paquet">paquet</option>
-          <option value="pack">pack</option>
-          <option value="botte">botte</option>
-          <option value="motte">motte</option>
-          <option value="boîte">boîte</option>
-          <option value="tranche(s)">tranche(s)</option>
-          <option value="sachet">sachet</option>
-        </select>
+        <div class="suggest-hint" id="suggestHint">&nbsp;</div>
+        <button class="add-btn" id="addBtn">+ Ajouter</button>
       </div>
-      <div class="suggest-hint" id="suggestHint">&nbsp;</div>
-      <button class="add-btn" id="addBtn">+ Ajouter</button>
+
+      <div class="list-section">
+        <ul class="items" id="todoList"></ul>
+        <div id="todoEmpty" class="empty" style="display:none;">La liste est vide, ajoutez quelque chose ✏️</div>
+      </div>
+
+      <div class="actions-bar">
+        <button class="ghost-btn" id="showCheckedBtn">Voir les articles cochés</button>
+        <button class="ghost-btn danger" id="resetListBtn">Réinitialiser la liste</button>
+      </div>
     </div>
 
-    <div class="list-section">
-      <ul class="items" id="todoList"></ul>
-      <div id="todoEmpty" class="empty" style="display:none;">La liste est vide, ajoutez quelque chose ✏️</div>
+    <div class="footer-note">appuyez sur le rond pour valider un achat — 3 secondes pour annuler</div>
+  </div>
+
+  <!-- ==================== PAGE PLANNING ==================== -->
+  <div class="page" id="page-planning">
+    <div class="week-nav">
+      <button class="week-arrow" id="prevWeekBtn">‹</button>
+      <div class="week-label" id="weekLabel">Semaine</div>
+      <button class="week-arrow" id="nextWeekBtn">›</button>
     </div>
+    <div class="week-tools">
+      <input type="date" id="weekPicker">
+      <button class="today-btn" id="todayWeekBtn">Semaine actuelle</button>
+    </div>
+
+    <div class="planning-table" id="planningTable"></div>
 
     <div class="actions-bar">
-      <button class="ghost-btn" id="showCheckedBtn">Voir les articles cochés</button>
-      <button class="ghost-btn danger" id="resetListBtn">Réinitialiser la liste</button>
+      <button class="ghost-btn danger" id="clearWeekBtn">Effacer les repas de cette semaine</button>
     </div>
   </div>
-
-  <div class="footer-note">appuyez sur le rond pour valider un achat — 3 secondes pour annuler</div>
 </div>
 
 <div class="overlay" id="overlay">
@@ -371,9 +473,10 @@ const db = getFirestore(app);
 const docRef = doc(db, "courses", "liste-partagee");
 
 const GRACE_MS = 3000;
-let state = { lists: [], activeListId: null };
+let state = { lists: [], activeListId: null, meals: {} };
 let hideTimers = {};
-let suppressNextSnapshot = false; // évite de re-render juste après notre propre écriture
+let suppressNextSnapshot = false;
+let saveDebounceTimer = null;
 
 const UNIT_RULES = [
   { keywords: ['pomme de terre','patate','carotte','farine','sucre','riz','pâtes','oignon jaune','lentille','semoule'], unit:'kg', qty:1 },
@@ -399,6 +502,86 @@ function escapeHtml(str){ const d=document.createElement('div'); d.textContent=s
 function formatQty(qty, unit){ const q=(qty%1===0)?qty:qty.toFixed(1); return `${q} ${unit}`; }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
 
+// ---- Éléments DOM communs ----
+const pageTitle = document.getElementById('pageTitle');
+const statusLabel = document.getElementById('statusLabel');
+const pageTabs = document.querySelectorAll('.page-tab');
+const pageCourses = document.getElementById('page-courses');
+const pagePlanning = document.getElementById('page-planning');
+
+const confirmOverlay = document.getElementById('confirmOverlay');
+const confirmText = document.getElementById('confirmText');
+const confirmCancelBtn = document.getElementById('confirmCancelBtn');
+const confirmOkBtn = document.getElementById('confirmOkBtn');
+
+function askConfirm(message){
+  return new Promise(resolve=>{
+    confirmText.textContent = message;
+    confirmOverlay.classList.add('show');
+    function cleanup(result){
+      confirmOverlay.classList.remove('show');
+      confirmOkBtn.removeEventListener('click', onOk);
+      confirmCancelBtn.removeEventListener('click', onCancel);
+      resolve(result);
+    }
+    function onOk(){ cleanup(true); }
+    function onCancel(){ cleanup(false); }
+    confirmOkBtn.addEventListener('click', onOk);
+    confirmCancelBtn.addEventListener('click', onCancel);
+  });
+}
+
+// ---- Navigation entre pages ----
+pageTabs.forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    pageTabs.forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    const target = btn.dataset.page;
+    pageCourses.classList.toggle('show', target==='courses');
+    pagePlanning.classList.toggle('show', target==='planning');
+    pageTitle.textContent = target==='courses' ? 'Carnet de courses' : 'Planning repas';
+    if(target==='planning') renderPlanning();
+  });
+});
+
+// ==================== FIRESTORE ====================
+onSnapshot(docRef, (snap)=>{
+  if(suppressNextSnapshot){ suppressNextSnapshot = false; return; }
+  if(snap.exists()){
+    const data = snap.data();
+    state.lists = data.lists || [];
+    state.meals = data.meals || {};
+    if(!state.activeListId || !state.lists.find(l=>l.id===state.activeListId)){
+      state.activeListId = state.lists[0] ? state.lists[0].id : null;
+    }
+  } else {
+    state.lists = []; state.activeListId = null; state.meals = {};
+  }
+  statusLabel.textContent = '';
+  renderAllCourses();
+  if(pagePlanning.classList.contains('show')) renderPlanning();
+}, (err)=>{
+  console.error(err);
+  statusLabel.textContent = 'connexion impossible';
+});
+
+async function save(){
+  suppressNextSnapshot = true;
+  try{
+    await setDoc(docRef, { lists: state.lists, meals: state.meals });
+  }catch(e){
+    console.error('Erreur de sauvegarde', e);
+    statusLabel.textContent = 'échec de sauvegarde';
+    suppressNextSnapshot = false;
+  }
+}
+// Sauvegarde différée (utile pour la saisie du planning, pour limiter les écritures)
+function saveDebounced(){
+  if(saveDebounceTimer) clearTimeout(saveDebounceTimer);
+  saveDebounceTimer = setTimeout(()=>{ save(); saveDebounceTimer=null; }, 700);
+}
+
+// ==================== PAGE COURSES ====================
 const tabsEl = document.getElementById('tabs');
 const newListRow = document.getElementById('newListRow');
 const newListInput = document.getElementById('newListInput');
@@ -419,63 +602,9 @@ const drawerTitle = document.getElementById('drawerTitle');
 const checkedList = document.getElementById('checkedList');
 const checkedEmpty = document.getElementById('checkedEmpty');
 const closeDrawerBtn = document.getElementById('closeDrawerBtn');
-const statusLabel = document.getElementById('statusLabel');
-const confirmOverlay = document.getElementById('confirmOverlay');
-const confirmText = document.getElementById('confirmText');
-const confirmCancelBtn = document.getElementById('confirmCancelBtn');
-const confirmOkBtn = document.getElementById('confirmOkBtn');
 
 function activeList(){ return state.lists.find(l=>l.id===state.activeListId) || null; }
 
-function askConfirm(message){
-  return new Promise(resolve=>{
-    confirmText.textContent = message;
-    confirmOverlay.classList.add('show');
-    function cleanup(result){
-      confirmOverlay.classList.remove('show');
-      confirmOkBtn.removeEventListener('click', onOk);
-      confirmCancelBtn.removeEventListener('click', onCancel);
-      resolve(result);
-    }
-    function onOk(){ cleanup(true); }
-    function onCancel(){ cleanup(false); }
-    confirmOkBtn.addEventListener('click', onOk);
-    confirmCancelBtn.addEventListener('click', onCancel);
-  });
-}
-
-// ---- Firestore : lecture temps réel + écriture ----
-onSnapshot(docRef, (snap)=>{
-  if(suppressNextSnapshot){ suppressNextSnapshot = false; return; }
-  if(snap.exists()){
-    const data = snap.data();
-    state.lists = data.lists || [];
-    if(!state.activeListId || !state.lists.find(l=>l.id===state.activeListId)){
-      state.activeListId = state.lists[0] ? state.lists[0].id : null;
-    }
-  } else {
-    state.lists = [];
-    state.activeListId = null;
-  }
-  statusLabel.textContent = '';
-  renderAll();
-}, (err)=>{
-  console.error(err);
-  statusLabel.textContent = 'connexion impossible';
-});
-
-async function save(){
-  suppressNextSnapshot = true;
-  try{
-    await setDoc(docRef, { lists: state.lists });
-  }catch(e){
-    console.error('Erreur de sauvegarde', e);
-    statusLabel.textContent = 'échec de sauvegarde';
-    suppressNextSnapshot = false;
-  }
-}
-
-// ---- Listes / onglets ----
 function renderTabs(){
   tabsEl.innerHTML = '';
   state.lists.forEach(l=>{
@@ -483,7 +612,7 @@ function renderTabs(){
     const btn = document.createElement('button');
     btn.className = 'tab' + (l.id===state.activeListId ? ' active' : '');
     btn.innerHTML = `${escapeHtml(l.name)} <span class="badge">${count}</span>`;
-    btn.addEventListener('click', ()=>{ state.activeListId = l.id; renderAll(); });
+    btn.addEventListener('click', ()=>{ state.activeListId = l.id; renderAllCourses(); });
     tabsEl.appendChild(btn);
   });
   const newBtn = document.createElement('button');
@@ -504,7 +633,7 @@ function createList(){
   state.activeListId = list.id;
   newListInput.value = '';
   newListRow.classList.remove('show');
-  renderAll();
+  renderAllCourses();
   save();
 }
 confirmNewList.addEventListener('click', createList);
@@ -535,7 +664,7 @@ function addItem(){
   const unit = unitSelect.value;
   list.items.unshift({ id: uid(), name, qty, unit, done:false, hidden:false });
   resetAddForm();
-  renderAll();
+  renderAllCourses();
   save();
 }
 addBtn.addEventListener('click', addItem);
@@ -549,16 +678,16 @@ function toggleItem(id){
   if(!it.done){
     it.done = true;
     it.hidden = false;
-    renderAll();
+    renderAllCourses();
     save();
     if(hideTimers[id]) clearTimeout(hideTimers[id]);
     hideTimers[id] = setTimeout(()=>{
       const li = document.querySelector(`#todoList li[data-id="${id}"]`);
       if(li){
         li.classList.add('fading');
-        setTimeout(()=>{ it.hidden = true; renderAll(); save(); }, 380);
+        setTimeout(()=>{ it.hidden = true; renderAllCourses(); save(); }, 380);
       } else {
-        it.hidden = true; renderAll(); save();
+        it.hidden = true; renderAllCourses(); save();
       }
       delete hideTimers[id];
     }, GRACE_MS);
@@ -566,7 +695,7 @@ function toggleItem(id){
     if(hideTimers[id]){ clearTimeout(hideTimers[id]); delete hideTimers[id]; }
     it.done = false;
     it.hidden = false;
-    renderAll();
+    renderAllCourses();
     save();
   }
 }
@@ -576,7 +705,7 @@ function removeItem(id){
   if(!list) return;
   if(hideTimers[id]){ clearTimeout(hideTimers[id]); delete hideTimers[id]; }
   list.items = list.items.filter(i=>i.id!==id);
-  renderAll();
+  renderAllCourses();
   save();
 }
 
@@ -602,7 +731,7 @@ function itemNode(it, opts){
   return li;
 }
 
-function renderList(){
+function renderListPanel(){
   const list = activeList();
   if(!list){
     listPanel.classList.remove('show');
@@ -628,9 +757,9 @@ function renderCheckedDrawer(){
   checkedEmpty.style.display = done.length ? 'none' : 'block';
 }
 
-function renderAll(){
+function renderAllCourses(){
   renderTabs();
-  renderList();
+  renderListPanel();
 }
 
 showCheckedBtn.addEventListener('click', ()=>{
@@ -648,7 +777,110 @@ resetListBtn.addEventListener('click', async ()=>{
   Object.keys(hideTimers).forEach(id=>clearTimeout(hideTimers[id]));
   hideTimers = {};
   list.items = [];
-  renderAll();
+  renderAllCourses();
+  save();
+});
+
+// ==================== PAGE PLANNING ====================
+const weekLabel = document.getElementById('weekLabel');
+const weekPicker = document.getElementById('weekPicker');
+const prevWeekBtn = document.getElementById('prevWeekBtn');
+const nextWeekBtn = document.getElementById('nextWeekBtn');
+const todayWeekBtn = document.getElementById('todayWeekBtn');
+const planningTable = document.getElementById('planningTable');
+const clearWeekBtn = document.getElementById('clearWeekBtn');
+
+const DAY_NAMES = ['Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi','Dimanche'];
+let currentMonday = getMonday(new Date());
+
+function getMonday(d){
+  const date = new Date(d);
+  date.setHours(0,0,0,0);
+  const day = date.getDay(); // 0=dimanche
+  const diff = (day===0 ? -6 : 1-day);
+  date.setDate(date.getDate()+diff);
+  return date;
+}
+function toKey(d){
+  const y=d.getFullYear(), m=String(d.getMonth()+1).padStart(2,'0'), day=String(d.getDate()).padStart(2,'0');
+  return `${y}-${m}-${day}`;
+}
+function sameDay(a,b){ return toKey(a)===toKey(b); }
+function addDays(d, n){ const r=new Date(d); r.setDate(r.getDate()+n); return r; }
+
+function weekLabelText(monday){
+  const sunday = addDays(monday, 6);
+  const optsShort = { day:'numeric', month:'long' };
+  const optsFull = { day:'numeric', month:'long', year:'numeric' };
+  return `${monday.toLocaleDateString('fr-FR', optsShort)} → ${sunday.toLocaleDateString('fr-FR', optsFull)}`;
+}
+
+function renderPlanning(){
+  const weekKey = toKey(currentMonday);
+  weekLabel.textContent = weekLabelText(currentMonday);
+  weekPicker.value = toKey(currentMonday);
+
+  const weekData = state.meals[weekKey] || {};
+  const today = new Date();
+
+  planningTable.innerHTML = '';
+  DAY_NAMES.forEach((name, idx)=>{
+    const date = addDays(currentMonday, idx);
+    const dayData = weekData[idx] || { midi:'', soir:'' };
+
+    const row = document.createElement('div');
+    row.className = 'day-row' + (sameDay(date, today) ? ' today' : '');
+
+    const label = document.createElement('div');
+    label.className = 'day-label';
+    label.innerHTML = `${name}<span class="date-sub">${date.toLocaleDateString('fr-FR',{day:'numeric', month:'short'})}</span>`;
+
+    const fields = document.createElement('div');
+    fields.className = 'meal-fields';
+
+    ['midi','soir'].forEach(slot=>{
+      const fieldWrap = document.createElement('div');
+      fieldWrap.className = 'meal-field';
+      const tag = document.createElement('span');
+      tag.className = 'meal-tag';
+      tag.textContent = slot;
+      const input = document.createElement('input');
+      input.type = 'text';
+      input.placeholder = slot==='midi' ? 'Repas du midi…' : 'Repas du soir…';
+      input.value = dayData[slot] || '';
+      input.addEventListener('input', ()=>{
+        if(!state.meals[weekKey]) state.meals[weekKey] = {};
+        if(!state.meals[weekKey][idx]) state.meals[weekKey][idx] = { midi:'', soir:'' };
+        state.meals[weekKey][idx][slot] = input.value;
+        saveDebounced();
+      });
+      fieldWrap.appendChild(tag);
+      fieldWrap.appendChild(input);
+      fields.appendChild(fieldWrap);
+    });
+
+    row.appendChild(label);
+    row.appendChild(fields);
+    planningTable.appendChild(row);
+  });
+}
+
+prevWeekBtn.addEventListener('click', ()=>{ currentMonday = addDays(currentMonday, -7); renderPlanning(); });
+nextWeekBtn.addEventListener('click', ()=>{ currentMonday = addDays(currentMonday, 7); renderPlanning(); });
+todayWeekBtn.addEventListener('click', ()=>{ currentMonday = getMonday(new Date()); renderPlanning(); });
+weekPicker.addEventListener('change', ()=>{
+  if(!weekPicker.value) return;
+  const [y,m,d] = weekPicker.value.split('-').map(Number);
+  currentMonday = getMonday(new Date(y, m-1, d));
+  renderPlanning();
+});
+
+clearWeekBtn.addEventListener('click', async ()=>{
+  const weekKey = toKey(currentMonday);
+  const ok = await askConfirm(`Effacer tous les repas de la semaine du ${weekLabelText(currentMonday)} ?`);
+  if(!ok) return;
+  delete state.meals[weekKey];
+  renderPlanning();
   save();
 });
 </script>
