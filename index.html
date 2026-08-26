@@ -572,6 +572,9 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import {
   getFirestore, doc, setDoc, onSnapshot
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+  getAuth, signInAnonymously, onAuthStateChanged
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
 const firebaseConfig = {
   apiKey: "AIzaSyBvRIzy5V2xBWWXxd-RSam_aOEgwN5O-Lc",
@@ -584,6 +587,7 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const auth = getAuth(app);
 const docRef = doc(db, "courses", "liste-partagee");
 
 const GRACE_MS = 3000;
@@ -721,6 +725,20 @@ pageTabs.forEach(btn=>{
 });
 
 // ==================== FIRESTORE ====================
+statusLabel.textContent = 'connexion…';
+
+onAuthStateChanged(auth, (user)=>{
+  if(user){
+    statusLabel.textContent = '';
+    startSync();
+  }
+});
+signInAnonymously(auth).catch((err)=>{
+  console.error('Erreur de connexion anonyme', err);
+  statusLabel.textContent = 'connexion impossible';
+});
+
+function startSync(){
 onSnapshot(docRef, (snap)=>{
   if(suppressNextSnapshot){ suppressNextSnapshot = false; return; }
   if(snap.exists()){
@@ -759,6 +777,7 @@ onSnapshot(docRef, (snap)=>{
   console.error(err);
   statusLabel.textContent = 'connexion impossible';
 });
+} // fin startSync()
 
 async function save(){
   suppressNextSnapshot = true;
