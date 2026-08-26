@@ -210,9 +210,31 @@
 
   .item-body{ flex:1; min-width:0; }
   .item-name{ font-size:1.02rem; font-weight:500; word-break:break-word; position:relative; display:inline-block; }
-  .item-qty{ font-family:'Space Mono', monospace; font-size:0.78rem; color: var(--mustard); margin-left:8px; }
+  .item-qty{
+    font-family:'Space Mono', monospace; font-size:0.78rem; color: var(--mustard); margin-left:8px;
+    cursor:pointer; border-bottom: 1px dashed var(--mustard); padding-bottom:1px;
+  }
+  .item-qty:hover{ color: var(--forest); border-bottom-color: var(--forest); }
   .item.done .item-name{ color: rgba(43,43,38,0.42); }
-  .item.done .item-qty{ color: rgba(43,43,38,0.32); }
+  .item.done .item-qty{ color: rgba(43,43,38,0.32); border-bottom-color: transparent; cursor:default; pointer-events:none; }
+
+  .qty-edit{
+    display:inline-flex; align-items:center; gap:5px; margin-left:8px;
+  }
+  .qty-edit input[type="number"]{
+    width:52px; padding:3px 5px; font-family:'Space Mono', monospace; font-size:0.8rem;
+    text-align:center; border-bottom:1.5px solid var(--forest);
+  }
+  .qty-edit select{
+    font-family:'Space Mono', monospace; font-size:0.75rem;
+    padding:3px 4px; border:none; border-bottom:1.5px solid var(--forest);
+    background:transparent; color:var(--ink); outline:none;
+  }
+  .qty-edit-ok{
+    flex:none; width:22px; height:22px; border-radius:50%;
+    border:none; background:var(--forest); color:var(--paper);
+    font-size:0.75rem; line-height:1; cursor:pointer;
+  }
 
   .strike{
     position:absolute; left:-2%; top:52%; width:0%; height:2px;
@@ -399,7 +421,7 @@
   }
   .memo-preview{
     font-family:'Kalam', cursive; font-size:0.98rem; line-height:1.35;
-    color: #2b2a1f; word-break:break-word; white-space:pre-wrap;
+    color: #2b2a1f; word-break:break-word; white-space:normal;
   }
   .memo-card.expanded .memo-preview{ display:none; }
   .memo-full{ display:none; }
@@ -597,6 +619,9 @@ function suggestUnit(name){
 function escapeHtml(str){ const d=document.createElement('div'); d.textContent=str; return d.innerHTML; }
 function formatQty(qty, unit){ const q=(qty%1===0)?qty:qty.toFixed(1); return `${q} ${unit}`; }
 function uid(){ return Date.now().toString(36)+Math.random().toString(36).slice(2,6); }
+
+const UNIT_OPTIONS = ['pièce','kg','g','L','ml','paquet','pack','botte','motte','boîte','tranche(s)','sachet'];
+let editingQtyId = null;
 
 // ---- Appui long générique (empêche le clic normal de se déclencher aussi) ----
 function makeLongPressable(el, onLongPress, onClick){
@@ -902,11 +927,21 @@ function itemNode(it, opts){
   const li = document.createElement('li');
   li.className = 'item' + (it.done ? ' done' : '');
   li.dataset.id = it.id;
+
+  const isEditing = editingQtyId === it.id && !it.done;
+  const qtyHtml = isEditing
+    ? `<span class="qty-edit">
+         <input type="number" class="qty-edit-input" step="0.1" min="0" value="${it.qty}">
+         <select class="qty-edit-unit">${UNIT_OPTIONS.map(u=>`<option value="${u}"${u===it.unit?' selected':''}>${u}</option>`).join('')}</select>
+         <button class="qty-edit-ok">✓</button>
+       </span>`
+    : `<span class="item-qty">${escapeHtml(formatQty(it.qty, it.unit))}</span>`;
+
   li.innerHTML = `
     <button class="check" aria-label="Valider l'achat"></button>
     <div class="item-body">
       <span class="item-name">${escapeHtml(it.name)}<span class="strike"></span></span>
-      <span class="item-qty">${escapeHtml(formatQty(it.qty, it.unit))}</span>
+      ${qtyHtml}
     </div>
     ${opts.undo ? '<button class="undo-btn">Remettre</button>' : '<button class="remove-btn">×</button>'}
   `;
@@ -916,6 +951,36 @@ function itemNode(it, opts){
   } else {
     li.querySelector('.remove-btn').addEventListener('click', ()=>removeItem(it.id));
   }
+
+  if(isEditing){
+    const numInput = li.querySelector('.qty-edit-input');
+    const unitSel = li.querySelector('.qty-edit-unit');
+    const okBtn = li.querySelector('.qty-edit-ok');
+    const commit = ()=>{
+      const newQty = parseFloat(numInput.value);
+      it.qty = isNaN(newQty) ? it.qty : newQty;
+      it.unit = unitSel.value;
+      editingQtyId = null;
+      renderAllCourses();
+      markModified('courses');
+      save();
+    };
+    [numInput, unitSel, okBtn].forEach(el=>{
+      el.addEventListener('click', e=>e.stopPropagation());
+      el.addEventListener('mousedown', e=>e.stopPropagation());
+    });
+    okBtn.addEventListener('click', commit);
+    numInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); commit(); } });
+    setTimeout(()=>{ numInput.focus(); numInput.select(); }, 0);
+  } else if(!it.done){
+    const qtyEl = li.querySelector('.item-qty');
+    qtyEl.addEventListener('click', (e)=>{
+      e.stopPropagation();
+      editingQtyId = it.id;
+      renderAllCourses();
+    });
+  }
+
   return li;
 }
 
@@ -1088,9 +1153,9 @@ let expandedMemoIds = new Set();
 let memoSaveTimers = {};
 
 function truncateWords(text, n){
-  const words = text.trim().split(/\s+/);
-  if(words.length <= n) return text.trim();
-  return words.slice(0, n).join(' ') + '…';
+  const words = text.trim().split(/\s+/).filter(Boolean);
+  const truncated = words.length > n;
+  return words.slice(0, n).join(' ') + (truncated ? '…' : '');
 }
 
 newMemoBtn.addEventListener('click', ()=>{
